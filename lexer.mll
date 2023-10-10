@@ -49,7 +49,9 @@ rule token = parse
 |   '('				{ LPAREN }
 |   ')'				{ RPAREN }
 |   '/'       		{ DIVIS }
-|    '%'       		{ MOD }
+|   '%'       		{ MOD }
+|   '+'             { ADD }
+|   '-'       		{ SUB }
 |	dec	as n	    { INT (int_of_string n) }
 |   var as id       { ID ( id )}
 |	eof				{ EOF }

@@ -104,6 +104,11 @@ let rec comp_stmt s =
 		q @ [
 			INVOKE (cSET, v, f)
 		]
+	| SET_VAR (f, e) ->
+		let (v, q) = comp_expr e in
+		q @ [
+			SET(v, f)
+		]
 	| _ ->
 		failwith "bad instruction"
 

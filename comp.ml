@@ -66,9 +66,15 @@ let rec comp_expr e =
 		(v, [
 			INVOKE (cGET + f, v, pos x y)
 		])
+	| CST (n) ->
+		let v = new_reg () in
+			(v, [SETI(v, n)])
+	| VAR (var) ->
+    let v = new_reg () in
+		(v, [SET(v, var)])
 	| _ ->
-		failwith "bad expression"
-
+		failwith "bad instruction"
+		
 
 (** Compile a condition.
 	@param c		Condition to compile.

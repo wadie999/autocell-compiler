@@ -72,6 +72,73 @@ let rec comp_expr e =
 	| VAR (var) ->
     let v = new_reg () in
 		(v, [SET(v, var)])
+	| NEG (e) ->
+			let x = new_reg () in
+				(
+					let (v, q) = comp_expr e in
+						(x, q @ [
+							SETI(x,0)
+							;
+							SUB (x, x, v)
+						])
+					)
+	
+	| BINOP (w,e1,e2) -> match w with
+			| OP_ADD ->
+				(
+					let x = new_reg () in
+						(
+							let (v, q) = comp_expr e1 in
+							let (v2, q2) = comp_expr e2 in
+								(x, q @ [
+									ADD (x, v, v2)
+											] @ q2)
+								)
+				)
+	| OP_SUB ->
+				(
+					let x = new_reg () in
+						(
+							let (v, q) = comp_expr e1 in
+							let (v2, q2) = comp_expr e2 in
+								(x, q @ [
+									SUB (x, v, v2)
+											] @ q2)
+								)
+				)
+	| OP_MUL ->
+				(
+					let x = new_reg () in
+						(
+							let (v, q) = comp_expr e1 in
+							let (v2, q2) = comp_expr e2 in
+								(x, q @ [
+									MUL (x, v, v2)
+											] @ q2)
+								)
+				)
+	| OP_DIV->
+				(
+					let x = new_reg () in
+						(
+							let (v, q) = comp_expr e1 in
+							let (v2, q2) = comp_expr e2 in
+								(x, q @ [
+									DIV (x, v, v2)
+											] @ q2)
+								)
+				)
+	| OP_MOD ->
+				(
+					let x = new_reg () in
+						(
+							let (v, q) = comp_expr e1 in
+							let (v2, q2) = comp_expr e2 in
+								(x, q @ [
+									MOD (x, v, v2)
+											] @ q2)
+								)
+				)	
 	| _ ->
 		failwith "bad instruction"
 		
@@ -109,73 +176,6 @@ let rec comp_stmt s =
 		q @ [
 			SET(v, f)
 		]
-	| NEG (e) ->
-		let x = new_reg () in
-			(
-				let (v, q) = comp_expr e in
-					(x, q @ [
-						SETI(x,0)
-						;
-						SUB (x, x, v)
-					])
-				)
-
-	| BINOP (w,e1,e2) -> match w with
-		| OP_ADD ->
-			(
-				let x = new_reg () in
-					(
-						let (v, q) = comp_expr e1 in
-						let (v2, q2) = comp_expr e2 in
-							(x, q @ [
-								ADD (x, v, v2)
-										] @ q2)
-							)
-			)
-	| OP_SUB ->
-			(
-				let x = new_reg () in
-					(
-						let (v, q) = comp_expr e1 in
-						let (v2, q2) = comp_expr e2 in
-							(x, q @ [
-								SUB (x, v, v2)
-										] @ q2)
-							)
-			)
-	| OP_MUL ->
-			(
-				let x = new_reg () in
-					(
-						let (v, q) = comp_expr e1 in
-						let (v2, q2) = comp_expr e2 in
-							(x, q @ [
-								MUL (x, v, v2)
-										] @ q2)
-							)
-			)
-	| OP_DIV->
-			(
-				let x = new_reg () in
-					(
-						let (v, q) = comp_expr e1 in
-						let (v2, q2) = comp_expr e2 in
-							(x, q @ [
-								DIV (x, v, v2)
-										] @ q2)
-							)
-			)
-	| OP_MOD ->
-			(
-				let x = new_reg () in
-					(
-						let (v, q) = comp_expr e1 in
-						let (v2, q2) = comp_expr e2 in
-							(x, q @ [
-								MOD (x, v, v2)
-										] @ q2)
-							)
-			)	
 	| _ ->
 		failwith "bad expression"
 

@@ -52,12 +52,12 @@ rule token = parse
 |   '%'       		{ MOD }
 |   "if"			{ IF}
 |   "then"          { THEN }
-|     "="           {EQUAL}
-|     "!="      	{DIFF}
-|     ""  			{INF}
-|      ""        	{INFEQ}
-|      ""         	{SUP}
-|      ""        	{SUPEQ}
+|     "="           { EQUAL}
+|     "!="      	{ DIFF}
+|     "<"  			{ INF}
+|      "<="        	{ INFEQ}
+|      ">"         	{ SUP}
+|      ">="        	{ SUPEQ}
 |	dec	as n	    { INT (int_of_string n) }
 |   var as id       { ID ( id )}
 |	eof				{ EOF }

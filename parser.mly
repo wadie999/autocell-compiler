@@ -60,6 +60,16 @@ let rec make_when f v ws =
 %token MOD
 %token LPAREN 
 %token RPAREN
+%token IF
+%token THEN
+%token ASSIGN
+%token EQUAL
+%token DIFF
+%token INF
+%token INFEQ
+%token SUP
+%token SUPEQ
+%token END
 /* values */
 %token <string> ID
 %token <int> INT
@@ -117,8 +127,25 @@ statement:
 		}
 |	ID ASSIGN E
 	    { SET_VAR(declare_var($1) , $3)}
+|	IF condition THEN opt_statements END
+		{
+			IF_THEN($2, $4, NOP)
+		}
 ;
 
+condition :
+	E EQUAL E 
+		{ COMP(COMP_EQ, $1,$3 )}
+|	E DIFF E 
+		{ COMP(COMP_NE, $1,$3 )}
+|	E INF E 
+		{ COMP(COMP_LT, $1,$3 )}
+|	E INFEQ E 
+		{ COMP(COMP_LE, $1,$3 )}	
+|	E SUP E 
+		{ COMP(COMP_GT, $1,$3 )}
+|	E SUPEQ E 
+		{ COMP(COMP_GE, $1,$3 )}	
 
 cell:
 	LBRACKET INT COMMA INT RBRACKET
@@ -165,7 +192,7 @@ F :
 |	MINUS F
 		{ NEG($2) }
 |	PLUS F
-		{ NONE }
+		{ $2 }
 
 
 

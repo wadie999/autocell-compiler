@@ -128,6 +128,10 @@ statement:
 		}
 |	ID ASSIGN E
 	    { SET_VAR(declare_var($1) , $3)}
+|	IF condition THEN opt_statements END
+		{
+			IF_THEN($2, $4, NOP)
+		}
 |	IF condition THEN opt_statements ELSE opt_statements END
 		{
 			IF_THEN($2, $4, $6)

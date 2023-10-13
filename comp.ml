@@ -67,10 +67,13 @@ let rec comp_expr e =
 			INVOKE (cGET + f, v, pos x y)
 		])
 	| CST (n) ->
-		let v = new_reg () in
-			(v, [SETI(v, n)])
+			let v = new_reg () in
+				(
+					v, 
+					[SETI(v, n)]
+				)
 	| VAR (var) ->
-    let v = new_reg () in
+    	let v = new_reg () in
 		(v, [SET(v, var)])
 	| NEG (e) ->
 			let x = new_reg () in
@@ -150,12 +153,76 @@ let rec comp_expr e =
 	@return			Quads implementing the condition. *)
 let rec comp_cond c l_then l_else =
 
-
 	match c with
-
+	| COMP(w, e1,e2 ) -> match w with
+			| COMP_EQ ->
+				(
+					let x = new_reg () in
+						(
+							let (v, q) = comp_expr e1 in
+							let (v2, q2) = comp_expr e2 in
+								(x, q @ [
+									ADD (x, v, v2)
+											] @ q2)
+								)
+				)
+			| COMP_NE ->
+				(
+					let x = new_reg () in
+						(
+							let (v, q) = comp_expr e1 in
+							let (v2, q2) = comp_expr e2 in
+								(x, q @ [
+									ADD (x, v, v2)
+											] @ q2)
+								)
+				)
+			| COMP_LT ->
+					(
+						let x = new_reg () in
+							(
+								let (v, q) = comp_expr e1 in
+								let (v2, q2) = comp_expr e2 in
+									(x, q @ [
+										ADD (x, v, v2)
+												] @ q2)
+									)
+					)
+			| COMP_LE ->
+						(
+							let x = new_reg () in
+								(
+									let (v, q) = comp_expr e1 in
+									let (v2, q2) = comp_expr e2 in
+										(x, q @ [
+											ADD (x, v, v2)
+													] @ q2)
+										)
+						)
+			| COMP_GT ->
+						(
+								let x = new_reg () in
+									(
+										let (v, q) = comp_expr e1 in
+										let (v2, q2) = comp_expr e2 in
+											(x, q @ [
+												ADD (x, v, v2)
+														] @ q2)
+											)
+						)
+			| COMP_GE ->
+						(
+									let x = new_reg () in
+										(
+											let (v, q) = comp_expr e1 in
+											let (v2, q2) = comp_expr e2 in
+												(x, q @ [
+													ADD (x, v, v2)
+															] @ q2)
+												)
+						)
 	| _ ->
 		failwith "bad condition"
-
 
 (** Compile a statement.
 	@param s	Statement to compile.

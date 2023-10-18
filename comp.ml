@@ -151,29 +151,30 @@ let rec comp_expr e =
 	@param l_then	Label to branch to when the condition is true.
 	@param l_else	Label to branch to when the condition is false.
 	@return			Quads implementing the condition. *)
-	let rec comp_cond c l_then l_else =
+	let rec comp_cond c =
 		match c with
 		| COMP(w, e1, e2) ->
-			(
-				let (v1, q1) = comp_expr e1 in
-				let (v2, q2) = comp_expr e2 in
+			let l_then = new_lab () in
+			let l_else = new_lab () in
+			let (v1, q1) = comp_expr e1 in
+			let (v2, q2) = comp_expr e2 in
 	
-				let condition_quads =
-					match w with
-					| COMP_EQ -> q1 @ q2 @ [GOTO_EQ(v1, v2, l_then)]
-					| COMP_NE -> q1 @ q2 @ [GOTO_NE(v1, v2, l_then)]
-					| COMP_LT -> q1 @ q2 @ [GOTO_LT(v1, v2, l_then)]
-					| COMP_LE -> q1 @ q2 @ [GOTO_LE(v1, v2, l_then)]
-					| COMP_GT -> q1 @ q2 @ [GOTO_GT(v1, v2, l_then)]
-					| COMP_GE -> q1 @ q2 @ [GOTO_GE(v1, v2, l_then)]
-				in
+			let condition_quads =
+				match w with
+				| COMP_EQ -> q1 @ q2 @ [GOTO_EQ(v1, v2, l_then)]
+				| COMP_NE -> q1 @ q2 @ [GOTO_NE(v1, v2, l_then)]
+				| COMP_LT -> q1 @ q2 @ [GOTO_LT(v1, v2, l_then)]
+				| COMP_LE -> q1 @ q2 @ [GOTO_LE(v1, v2, l_then)]
+				| COMP_GT -> q1 @ q2 @ [GOTO_GT(v1, v2, l_then)]
+				| COMP_GE -> q1 @ q2 @ [GOTO_GE(v1, v2, l_then)]
+			in
 	
-				let jump_to_false = [GOTO(l_else)] in
+			let jump_to_false = [GOTO(l_else)] in
 	
-				condition_quads @ jump_to_false
-			)
+			[LABEL l_then] @ condition_quads @ jump_to_false
 		| _ ->
 			failwith "bad condition"
+	
 	
 	let rec comp_stmt s =
 		match s with
@@ -187,14 +188,12 @@ let rec comp_expr e =
 		| SET_VAR (f, e) ->
 			let (v, q) = comp_expr e in
 			q @ [SET(v, f)]
-		| IF_THEN(cond, then_stmt, else_stmt) ->
-			let l_then = new_lab () in
-			let l_else = new_lab () in
-			let l_end = new_lab () in
-			let cond_quads = comp_cond cond l_then l_else in
-			let then_quads = comp_stmt then_stmt in
-			let else_quads = comp_stmt else_stmt in
-			[LABEL l_then] @ cond_quads @ then_quads @ [GOTO l_end; LABEL l_else] @ else_quads @ [LABEL l_end]
+			| IF_THEN(cond, then_stmt, else_stmt) ->
+				let cond_quads = comp_cond cond in
+				let then_quads = comp_stmt then_stmt in
+				let else_quads = comp_stmt else_stmt in
+				cond_quads @ then_quads @ [GOTO l_end; LABEL l_else] @ else_quads @ [LABEL l_end]
+		
 		| _ ->
 			failwith "bad expression"
 	

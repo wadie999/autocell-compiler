@@ -53,7 +53,7 @@ rule token = parse
 |   "if"			{ IF}
 |   "then"          { THEN }
 |   "else"          { ELSE }
-|   "elseif"        { ELSIF }
+|   "elsif"        { ELSIF }
 |     "="           { EQUAL}
 |     "!="      	{ DIFF}
 |     "<"  			{ INF}

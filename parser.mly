@@ -61,6 +61,7 @@ let rec make_when f v ws =
 %token LPAREN 
 %token RPAREN
 %token IF
+%token ELSIF
 %token THEN
 %token ASSIGN
 %token EQUAL
@@ -116,7 +117,7 @@ opt_statements:
 	/* empty */
 		{ NOP }
 |	statement opt_statements
-		{ $1 }
+		{ SEQ ($1, $2) }
 ;
 
 statement:
@@ -136,6 +137,7 @@ statement:
 		{
 			IF_THEN($2, $4, $6)
 		}
+		
 ;
 
 condition :

@@ -51,6 +51,8 @@ rule token = parse
 |   '/'       		{ DIVIS }
 |   '%'       		{ MOD }
 |   "if"			{ IF}
+|   "when"          { WHEN }
+|   "otherwise"     { OTHERWISE }
 |   "then"          { THEN }
 |   "else"          { ELSE }
 |   "elsif"        { ELSIF }

@@ -63,6 +63,8 @@ let rec make_when f v ws =
 %token IF
 %token ELSIF
 %token THEN
+%token WHEN
+%token OTHERWISE
 %token ASSIGN
 %token EQUAL
 %token DIFF
@@ -129,11 +131,34 @@ statement:
 		}
 |	ID ASSIGN E
 	    { SET_VAR(declare_var($1) , $3)}
+
+
+|	ID ASSIGN when_clauses 
+		{ NOP }
+
+
+|	cell ASSIGN when_clauses 
+	    { NOP }
+
+
 |	IF condition THEN opt_statements else_clause END
 		{
 			IF_THEN($2, $4, $5)
 		}	
 ;
+
+
+when_clauses:
+    
+    E OTHERWISE
+    
+         { NONE }
+|	E WHEN condition COMMA when_clauses
+		{ NONE }
+
+;
+
+
 
 else_clause:
 	/* empty */

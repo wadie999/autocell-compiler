@@ -15,38 +15,43 @@
 
    9  statement : cell ASSIGN E
   10            | ID ASSIGN E
-  11            | IF condition THEN opt_statements else_clause END
+  11            | ID ASSIGN when_clauses
+  12            | cell ASSIGN when_clauses
+  13            | IF condition THEN opt_statements else_clause END
 
-  12  else_clause :
-  13              | ELSIF condition THEN opt_statements else_clause
-  14              | ELSE opt_statements
+  14  when_clauses : E OTHERWISE
+  15               | E WHEN condition COMMA when_clauses
 
-  15  condition : E EQUAL E
-  16            | E DIFF E
-  17            | E INF E
-  18            | E INFEQ E
-  19            | E SUP E
-  20            | E SUPEQ E
+  16  else_clause :
+  17              | ELSIF condition THEN opt_statements else_clause
+  18              | ELSE opt_statements
 
-  21  cell : LBRACKET INT COMMA INT RBRACKET
+  19  condition : E EQUAL E
+  20            | E DIFF E
+  21            | E INF E
+  22            | E INFEQ E
+  23            | E SUP E
+  24            | E SUPEQ E
 
-  22  E : E PLUS T
-  23    | E MINUS T
-  24    | T
+  25  cell : LBRACKET INT COMMA INT RBRACKET
 
-  25  T : T TIMES F
-  26    | T DIVIS F
-  27    | T MOD F
-  28    | F
+  26  E : E PLUS T
+  27    | E MINUS T
+  28    | T
 
-  29  F : cell
-  30    | INT
-  31    | ID
-  32    | LPAREN E RPAREN
-  33    | MINUS F
-  34    | PLUS F
+  29  T : T TIMES F
+  30    | T DIVIS F
+  31    | T MOD F
+  32    | F
 
-  35  %entry% : '\001' program
+  33  F : cell
+  34    | INT
+  35    | ID
+  36    | LPAREN E RPAREN
+  37    | MINUS F
+  38    | PLUS F
+
+  39  %entry% : '\001' program
 
 state 0
 	$accept : . %entry% $end  (0)
@@ -58,7 +63,7 @@ state 0
 
 
 state 1
-	%entry% : '\001' . program  (35)
+	%entry% : '\001' . program  (39)
 
 	INT  shift 3
 	.  error
@@ -80,9 +85,9 @@ state 3
 
 
 state 4
-	%entry% : '\001' program .  (35)
+	%entry% : '\001' program .  (39)
 
-	.  reduce 35
+	.  reduce 39
 
 
 state 5
@@ -190,14 +195,14 @@ state 17
 
 
 state 18
-	cell : LBRACKET . INT COMMA INT RBRACKET  (21)
+	cell : LBRACKET . INT COMMA INT RBRACKET  (25)
 
 	INT  shift 26
 	.  error
 
 
 state 19
-	statement : IF . condition THEN opt_statements else_clause END  (11)
+	statement : IF . condition THEN opt_statements else_clause END  (13)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -216,6 +221,7 @@ state 19
 
 state 20
 	statement : ID . ASSIGN E  (10)
+	statement : ID . ASSIGN when_clauses  (11)
 
 	ASSIGN  shift 37
 	.  error
@@ -247,6 +253,7 @@ state 22
 
 state 23
 	statement : cell . ASSIGN E  (9)
+	statement : cell . ASSIGN when_clauses  (12)
 
 	ASSIGN  shift 40
 	.  error
@@ -266,14 +273,14 @@ state 25
 
 
 state 26
-	cell : LBRACKET INT . COMMA INT RBRACKET  (21)
+	cell : LBRACKET INT . COMMA INT RBRACKET  (25)
 
 	COMMA  shift 42
 	.  error
 
 
 state 27
-	F : PLUS . F  (34)
+	F : PLUS . F  (38)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -288,7 +295,7 @@ state 27
 
 
 state 28
-	F : MINUS . F  (33)
+	F : MINUS . F  (37)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -303,7 +310,7 @@ state 28
 
 
 state 29
-	F : LPAREN . E RPAREN  (32)
+	F : LPAREN . E RPAREN  (36)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -320,32 +327,32 @@ state 29
 
 
 state 30
-	F : ID .  (31)
+	F : ID .  (35)
 
-	.  reduce 31
+	.  reduce 35
 
 
 state 31
-	F : INT .  (30)
+	F : INT .  (34)
 
-	.  reduce 30
+	.  reduce 34
 
 
 state 32
-	F : cell .  (29)
+	F : cell .  (33)
 
-	.  reduce 29
+	.  reduce 33
 
 
 state 33
-	condition : E . EQUAL E  (15)
-	condition : E . DIFF E  (16)
-	condition : E . INF E  (17)
-	condition : E . INFEQ E  (18)
-	condition : E . SUP E  (19)
-	condition : E . SUPEQ E  (20)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
+	condition : E . EQUAL E  (19)
+	condition : E . DIFF E  (20)
+	condition : E . INF E  (21)
+	condition : E . INFEQ E  (22)
+	condition : E . SUP E  (23)
+	condition : E . SUPEQ E  (24)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
 
 	PLUS  shift 46
 	MINUS  shift 47
@@ -359,48 +366,52 @@ state 33
 
 
 state 34
-	statement : IF condition . THEN opt_statements else_clause END  (11)
+	statement : IF condition . THEN opt_statements else_clause END  (13)
 
 	THEN  shift 54
 	.  error
 
 
 state 35
-	E : T .  (24)
-	T : T . TIMES F  (25)
-	T : T . DIVIS F  (26)
-	T : T . MOD F  (27)
+	E : T .  (28)
+	T : T . TIMES F  (29)
+	T : T . DIVIS F  (30)
+	T : T . MOD F  (31)
 
 	TIMES  shift 55
 	DIVIS  shift 56
 	MOD  shift 57
-	EOF  reduce 24
-	END  reduce 24
-	LBRACKET  reduce 24
-	PLUS  reduce 24
-	MINUS  reduce 24
-	RPAREN  reduce 24
-	IF  reduce 24
-	ELSIF  reduce 24
-	THEN  reduce 24
-	EQUAL  reduce 24
-	DIFF  reduce 24
-	INF  reduce 24
-	INFEQ  reduce 24
-	SUP  reduce 24
-	SUPEQ  reduce 24
-	ELSE  reduce 24
-	ID  reduce 24
+	EOF  reduce 28
+	END  reduce 28
+	COMMA  reduce 28
+	LBRACKET  reduce 28
+	PLUS  reduce 28
+	MINUS  reduce 28
+	RPAREN  reduce 28
+	IF  reduce 28
+	ELSIF  reduce 28
+	THEN  reduce 28
+	WHEN  reduce 28
+	OTHERWISE  reduce 28
+	EQUAL  reduce 28
+	DIFF  reduce 28
+	INF  reduce 28
+	INFEQ  reduce 28
+	SUP  reduce 28
+	SUPEQ  reduce 28
+	ELSE  reduce 28
+	ID  reduce 28
 
 
 state 36
-	T : F .  (28)
+	T : F .  (32)
 
-	.  reduce 28
+	.  reduce 32
 
 
 state 37
 	statement : ID ASSIGN . E  (10)
+	statement : ID ASSIGN . when_clauses  (11)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -412,6 +423,7 @@ state 37
 
 	cell  goto 32
 	E  goto 58
+	when_clauses  goto 59
 	T  goto 35
 	F  goto 36
 
@@ -430,6 +442,7 @@ state 39
 
 state 40
 	statement : cell ASSIGN . E  (9)
+	statement : cell ASSIGN . when_clauses  (12)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -440,7 +453,8 @@ state 40
 	.  error
 
 	cell  goto 32
-	E  goto 59
+	E  goto 60
+	when_clauses  goto 61
 	T  goto 35
 	F  goto 36
 
@@ -452,37 +466,37 @@ state 41
 
 
 state 42
-	cell : LBRACKET INT COMMA . INT RBRACKET  (21)
+	cell : LBRACKET INT COMMA . INT RBRACKET  (25)
 
-	INT  shift 60
+	INT  shift 62
 	.  error
 
 
 state 43
-	F : PLUS F .  (34)
+	F : PLUS F .  (38)
 
-	.  reduce 34
+	.  reduce 38
 
 
 state 44
-	F : MINUS F .  (33)
+	F : MINUS F .  (37)
 
-	.  reduce 33
+	.  reduce 37
 
 
 state 45
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
-	F : LPAREN E . RPAREN  (32)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
+	F : LPAREN E . RPAREN  (36)
 
 	PLUS  shift 46
 	MINUS  shift 47
-	RPAREN  shift 61
+	RPAREN  shift 63
 	.  error
 
 
 state 46
-	E : E PLUS . T  (22)
+	E : E PLUS . T  (26)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -493,12 +507,12 @@ state 46
 	.  error
 
 	cell  goto 32
-	T  goto 62
+	T  goto 64
 	F  goto 36
 
 
 state 47
-	E : E MINUS . T  (23)
+	E : E MINUS . T  (27)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -509,46 +523,12 @@ state 47
 	.  error
 
 	cell  goto 32
-	T  goto 63
+	T  goto 65
 	F  goto 36
 
 
 state 48
-	condition : E EQUAL . E  (15)
-
-	LBRACKET  shift 18
-	PLUS  shift 27
-	MINUS  shift 28
-	LPAREN  shift 29
-	ID  shift 30
-	INT  shift 31
-	.  error
-
-	cell  goto 32
-	E  goto 64
-	T  goto 35
-	F  goto 36
-
-
-state 49
-	condition : E DIFF . E  (16)
-
-	LBRACKET  shift 18
-	PLUS  shift 27
-	MINUS  shift 28
-	LPAREN  shift 29
-	ID  shift 30
-	INT  shift 31
-	.  error
-
-	cell  goto 32
-	E  goto 65
-	T  goto 35
-	F  goto 36
-
-
-state 50
-	condition : E INF . E  (17)
+	condition : E EQUAL . E  (19)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -564,8 +544,8 @@ state 50
 	F  goto 36
 
 
-state 51
-	condition : E INFEQ . E  (18)
+state 49
+	condition : E DIFF . E  (20)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -581,8 +561,8 @@ state 51
 	F  goto 36
 
 
-state 52
-	condition : E SUP . E  (19)
+state 50
+	condition : E INF . E  (21)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -598,8 +578,8 @@ state 52
 	F  goto 36
 
 
-state 53
-	condition : E SUPEQ . E  (20)
+state 51
+	condition : E INFEQ . E  (22)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -615,8 +595,42 @@ state 53
 	F  goto 36
 
 
+state 52
+	condition : E SUP . E  (23)
+
+	LBRACKET  shift 18
+	PLUS  shift 27
+	MINUS  shift 28
+	LPAREN  shift 29
+	ID  shift 30
+	INT  shift 31
+	.  error
+
+	cell  goto 32
+	E  goto 70
+	T  goto 35
+	F  goto 36
+
+
+state 53
+	condition : E SUPEQ . E  (24)
+
+	LBRACKET  shift 18
+	PLUS  shift 27
+	MINUS  shift 28
+	LPAREN  shift 29
+	ID  shift 30
+	INT  shift 31
+	.  error
+
+	cell  goto 32
+	E  goto 71
+	T  goto 35
+	F  goto 36
+
+
 state 54
-	statement : IF condition THEN . opt_statements else_clause END  (11)
+	statement : IF condition THEN . opt_statements else_clause END  (13)
 	opt_statements : .  (7)
 
 	LBRACKET  shift 18
@@ -626,43 +640,13 @@ state 54
 	ELSIF  reduce 7
 	ELSE  reduce 7
 
-	opt_statements  goto 70
+	opt_statements  goto 72
 	statement  goto 22
 	cell  goto 23
 
 
 state 55
-	T : T TIMES . F  (25)
-
-	LBRACKET  shift 18
-	PLUS  shift 27
-	MINUS  shift 28
-	LPAREN  shift 29
-	ID  shift 30
-	INT  shift 31
-	.  error
-
-	cell  goto 32
-	F  goto 71
-
-
-state 56
-	T : T DIVIS . F  (26)
-
-	LBRACKET  shift 18
-	PLUS  shift 27
-	MINUS  shift 28
-	LPAREN  shift 29
-	ID  shift 30
-	INT  shift 31
-	.  error
-
-	cell  goto 32
-	F  goto 72
-
-
-state 57
-	T : T MOD . F  (27)
+	T : T TIMES . F  (29)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -676,13 +660,47 @@ state 57
 	F  goto 73
 
 
+state 56
+	T : T DIVIS . F  (30)
+
+	LBRACKET  shift 18
+	PLUS  shift 27
+	MINUS  shift 28
+	LPAREN  shift 29
+	ID  shift 30
+	INT  shift 31
+	.  error
+
+	cell  goto 32
+	F  goto 74
+
+
+state 57
+	T : T MOD . F  (31)
+
+	LBRACKET  shift 18
+	PLUS  shift 27
+	MINUS  shift 28
+	LPAREN  shift 29
+	ID  shift 30
+	INT  shift 31
+	.  error
+
+	cell  goto 32
+	F  goto 75
+
+
 state 58
 	statement : ID ASSIGN E .  (10)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
+	when_clauses : E . OTHERWISE  (14)
+	when_clauses : E . WHEN condition COMMA when_clauses  (15)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
 
 	PLUS  shift 46
 	MINUS  shift 47
+	WHEN  shift 76
+	OTHERWISE  shift 77
 	EOF  reduce 10
 	END  reduce 10
 	LBRACKET  reduce 10
@@ -693,12 +711,22 @@ state 58
 
 
 state 59
+	statement : ID ASSIGN when_clauses .  (11)
+
+	.  reduce 11
+
+
+state 60
 	statement : cell ASSIGN E .  (9)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
+	when_clauses : E . OTHERWISE  (14)
+	when_clauses : E . WHEN condition COMMA when_clauses  (15)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
 
 	PLUS  shift 46
 	MINUS  shift 47
+	WHEN  shift 76
+	OTHERWISE  shift 77
 	EOF  reduce 9
 	END  reduce 9
 	LBRACKET  reduce 9
@@ -708,172 +736,184 @@ state 59
 	ID  reduce 9
 
 
-state 60
-	cell : LBRACKET INT COMMA INT . RBRACKET  (21)
-
-	RBRACKET  shift 74
-	.  error
-
-
 state 61
-	F : LPAREN E RPAREN .  (32)
+	statement : cell ASSIGN when_clauses .  (12)
 
-	.  reduce 32
+	.  reduce 12
 
 
 state 62
-	E : E PLUS T .  (22)
-	T : T . TIMES F  (25)
-	T : T . DIVIS F  (26)
-	T : T . MOD F  (27)
+	cell : LBRACKET INT COMMA INT . RBRACKET  (25)
 
-	TIMES  shift 55
-	DIVIS  shift 56
-	MOD  shift 57
-	EOF  reduce 22
-	END  reduce 22
-	LBRACKET  reduce 22
-	PLUS  reduce 22
-	MINUS  reduce 22
-	RPAREN  reduce 22
-	IF  reduce 22
-	ELSIF  reduce 22
-	THEN  reduce 22
-	EQUAL  reduce 22
-	DIFF  reduce 22
-	INF  reduce 22
-	INFEQ  reduce 22
-	SUP  reduce 22
-	SUPEQ  reduce 22
-	ELSE  reduce 22
-	ID  reduce 22
+	RBRACKET  shift 78
+	.  error
 
 
 state 63
-	E : E MINUS T .  (23)
-	T : T . TIMES F  (25)
-	T : T . DIVIS F  (26)
-	T : T . MOD F  (27)
+	F : LPAREN E RPAREN .  (36)
+
+	.  reduce 36
+
+
+state 64
+	E : E PLUS T .  (26)
+	T : T . TIMES F  (29)
+	T : T . DIVIS F  (30)
+	T : T . MOD F  (31)
 
 	TIMES  shift 55
 	DIVIS  shift 56
 	MOD  shift 57
-	EOF  reduce 23
-	END  reduce 23
-	LBRACKET  reduce 23
-	PLUS  reduce 23
-	MINUS  reduce 23
-	RPAREN  reduce 23
-	IF  reduce 23
-	ELSIF  reduce 23
-	THEN  reduce 23
-	EQUAL  reduce 23
-	DIFF  reduce 23
-	INF  reduce 23
-	INFEQ  reduce 23
-	SUP  reduce 23
-	SUPEQ  reduce 23
-	ELSE  reduce 23
-	ID  reduce 23
-
-
-state 64
-	condition : E EQUAL E .  (15)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
-
-	PLUS  shift 46
-	MINUS  shift 47
-	THEN  reduce 15
+	EOF  reduce 26
+	END  reduce 26
+	COMMA  reduce 26
+	LBRACKET  reduce 26
+	PLUS  reduce 26
+	MINUS  reduce 26
+	RPAREN  reduce 26
+	IF  reduce 26
+	ELSIF  reduce 26
+	THEN  reduce 26
+	WHEN  reduce 26
+	OTHERWISE  reduce 26
+	EQUAL  reduce 26
+	DIFF  reduce 26
+	INF  reduce 26
+	INFEQ  reduce 26
+	SUP  reduce 26
+	SUPEQ  reduce 26
+	ELSE  reduce 26
+	ID  reduce 26
 
 
 state 65
-	condition : E DIFF E .  (16)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
+	E : E MINUS T .  (27)
+	T : T . TIMES F  (29)
+	T : T . DIVIS F  (30)
+	T : T . MOD F  (31)
 
-	PLUS  shift 46
-	MINUS  shift 47
-	THEN  reduce 16
+	TIMES  shift 55
+	DIVIS  shift 56
+	MOD  shift 57
+	EOF  reduce 27
+	END  reduce 27
+	COMMA  reduce 27
+	LBRACKET  reduce 27
+	PLUS  reduce 27
+	MINUS  reduce 27
+	RPAREN  reduce 27
+	IF  reduce 27
+	ELSIF  reduce 27
+	THEN  reduce 27
+	WHEN  reduce 27
+	OTHERWISE  reduce 27
+	EQUAL  reduce 27
+	DIFF  reduce 27
+	INF  reduce 27
+	INFEQ  reduce 27
+	SUP  reduce 27
+	SUPEQ  reduce 27
+	ELSE  reduce 27
+	ID  reduce 27
 
 
 state 66
-	condition : E INF E .  (17)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
+	condition : E EQUAL E .  (19)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
 
 	PLUS  shift 46
 	MINUS  shift 47
-	THEN  reduce 17
-
-
-state 67
-	condition : E INFEQ E .  (18)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
-
-	PLUS  shift 46
-	MINUS  shift 47
-	THEN  reduce 18
-
-
-state 68
-	condition : E SUP E .  (19)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
-
-	PLUS  shift 46
-	MINUS  shift 47
+	COMMA  reduce 19
 	THEN  reduce 19
 
 
-state 69
-	condition : E SUPEQ E .  (20)
-	E : E . PLUS T  (22)
-	E : E . MINUS T  (23)
+state 67
+	condition : E DIFF E .  (20)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
 
 	PLUS  shift 46
 	MINUS  shift 47
+	COMMA  reduce 20
 	THEN  reduce 20
 
 
+state 68
+	condition : E INF E .  (21)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
+
+	PLUS  shift 46
+	MINUS  shift 47
+	COMMA  reduce 21
+	THEN  reduce 21
+
+
+state 69
+	condition : E INFEQ E .  (22)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
+
+	PLUS  shift 46
+	MINUS  shift 47
+	COMMA  reduce 22
+	THEN  reduce 22
+
+
 state 70
-	statement : IF condition THEN opt_statements . else_clause END  (11)
-	else_clause : .  (12)
+	condition : E SUP E .  (23)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
 
-	ELSIF  shift 75
-	ELSE  shift 76
-	END  reduce 12
-
-	else_clause  goto 77
+	PLUS  shift 46
+	MINUS  shift 47
+	COMMA  reduce 23
+	THEN  reduce 23
 
 
 state 71
-	T : T TIMES F .  (25)
+	condition : E SUPEQ E .  (24)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
 
-	.  reduce 25
+	PLUS  shift 46
+	MINUS  shift 47
+	COMMA  reduce 24
+	THEN  reduce 24
 
 
 state 72
-	T : T DIVIS F .  (26)
+	statement : IF condition THEN opt_statements . else_clause END  (13)
+	else_clause : .  (16)
 
-	.  reduce 26
+	ELSIF  shift 79
+	ELSE  shift 80
+	END  reduce 16
+
+	else_clause  goto 81
 
 
 state 73
-	T : T MOD F .  (27)
+	T : T TIMES F .  (29)
 
-	.  reduce 27
+	.  reduce 29
 
 
 state 74
-	cell : LBRACKET INT COMMA INT RBRACKET .  (21)
+	T : T DIVIS F .  (30)
 
-	.  reduce 21
+	.  reduce 30
 
 
 state 75
-	else_clause : ELSIF . condition THEN opt_statements else_clause  (13)
+	T : T MOD F .  (31)
+
+	.  reduce 31
+
+
+state 76
+	when_clauses : E WHEN . condition COMMA when_clauses  (15)
 
 	LBRACKET  shift 18
 	PLUS  shift 27
@@ -885,13 +925,43 @@ state 75
 
 	cell  goto 32
 	E  goto 33
-	condition  goto 78
+	condition  goto 82
 	T  goto 35
 	F  goto 36
 
 
-state 76
-	else_clause : ELSE . opt_statements  (14)
+state 77
+	when_clauses : E OTHERWISE .  (14)
+
+	.  reduce 14
+
+
+state 78
+	cell : LBRACKET INT COMMA INT RBRACKET .  (25)
+
+	.  reduce 25
+
+
+state 79
+	else_clause : ELSIF . condition THEN opt_statements else_clause  (17)
+
+	LBRACKET  shift 18
+	PLUS  shift 27
+	MINUS  shift 28
+	LPAREN  shift 29
+	ID  shift 30
+	INT  shift 31
+	.  error
+
+	cell  goto 32
+	E  goto 33
+	condition  goto 83
+	T  goto 35
+	F  goto 36
+
+
+state 80
+	else_clause : ELSE . opt_statements  (18)
 	opt_statements : .  (7)
 
 	LBRACKET  shift 18
@@ -899,39 +969,64 @@ state 76
 	ID  shift 20
 	END  reduce 7
 
-	opt_statements  goto 79
+	opt_statements  goto 84
 	statement  goto 22
 	cell  goto 23
 
 
-state 77
-	statement : IF condition THEN opt_statements else_clause . END  (11)
-
-	END  shift 80
-	.  error
-
-
-state 78
-	else_clause : ELSIF condition . THEN opt_statements else_clause  (13)
-
-	THEN  shift 81
-	.  error
-
-
-state 79
-	else_clause : ELSE opt_statements .  (14)
-
-	.  reduce 14
-
-
-state 80
-	statement : IF condition THEN opt_statements else_clause END .  (11)
-
-	.  reduce 11
-
-
 state 81
-	else_clause : ELSIF condition THEN . opt_statements else_clause  (13)
+	statement : IF condition THEN opt_statements else_clause . END  (13)
+
+	END  shift 85
+	.  error
+
+
+state 82
+	when_clauses : E WHEN condition . COMMA when_clauses  (15)
+
+	COMMA  shift 86
+	.  error
+
+
+state 83
+	else_clause : ELSIF condition . THEN opt_statements else_clause  (17)
+
+	THEN  shift 87
+	.  error
+
+
+state 84
+	else_clause : ELSE opt_statements .  (18)
+
+	.  reduce 18
+
+
+state 85
+	statement : IF condition THEN opt_statements else_clause END .  (13)
+
+	.  reduce 13
+
+
+state 86
+	when_clauses : E WHEN condition COMMA . when_clauses  (15)
+
+	LBRACKET  shift 18
+	PLUS  shift 27
+	MINUS  shift 28
+	LPAREN  shift 29
+	ID  shift 30
+	INT  shift 31
+	.  error
+
+	cell  goto 32
+	E  goto 88
+	when_clauses  goto 89
+	T  goto 35
+	F  goto 36
+
+
+state 87
+	else_clause : ELSIF condition THEN . opt_statements else_clause  (17)
 	opt_statements : .  (7)
 
 	LBRACKET  shift 18
@@ -941,27 +1036,46 @@ state 81
 	ELSIF  reduce 7
 	ELSE  reduce 7
 
-	opt_statements  goto 82
+	opt_statements  goto 90
 	statement  goto 22
 	cell  goto 23
 
 
-state 82
-	else_clause : ELSIF condition THEN opt_statements . else_clause  (13)
-	else_clause : .  (12)
+state 88
+	when_clauses : E . OTHERWISE  (14)
+	when_clauses : E . WHEN condition COMMA when_clauses  (15)
+	E : E . PLUS T  (26)
+	E : E . MINUS T  (27)
 
-	ELSIF  shift 75
-	ELSE  shift 76
-	END  reduce 12
-
-	else_clause  goto 83
-
-
-state 83
-	else_clause : ELSIF condition THEN opt_statements else_clause .  (13)
-
-	.  reduce 13
+	PLUS  shift 46
+	MINUS  shift 47
+	WHEN  shift 76
+	OTHERWISE  shift 77
+	.  error
 
 
-32 terminals, 14 nonterminals
-36 grammar rules, 84 states
+state 89
+	when_clauses : E WHEN condition COMMA when_clauses .  (15)
+
+	.  reduce 15
+
+
+state 90
+	else_clause : ELSIF condition THEN opt_statements . else_clause  (17)
+	else_clause : .  (16)
+
+	ELSIF  shift 79
+	ELSE  shift 80
+	END  reduce 16
+
+	else_clause  goto 91
+
+
+state 91
+	else_clause : ELSIF condition THEN opt_statements else_clause .  (17)
+
+	.  reduce 17
+
+
+34 terminals, 15 nonterminals
+40 grammar rules, 92 states

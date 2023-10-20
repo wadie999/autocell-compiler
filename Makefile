@@ -228,6 +228,15 @@ ARCHIVED_FILES = \
 	code/*.s \
 	parser.mly \
 	lexer.mll \
-	comp.ml
+	comp.ml \
+	ast.ml
 archive:
 	tar cvfz archive-$(DATE).tgz $(ARCHIVED_FILES)
+
+
+# fast compilation
+%.s: %.auto
+	./autocc $<
+
+%.exe: %.s
+	./autoas $<
